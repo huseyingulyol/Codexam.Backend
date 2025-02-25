@@ -1,0 +1,6 @@
+@Codexam.WebAPI_HostAddress = http://localhost:5207
+
+GET {{Codexam.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
