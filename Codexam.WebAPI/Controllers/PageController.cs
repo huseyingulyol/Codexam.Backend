@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Codexam.WebAPI.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Codexam.WebAPI.Controllers
@@ -25,7 +26,7 @@ namespace Codexam.WebAPI.Controllers
                 {
                     await file.CopyToAsync(stream);
                 }
-
+                //AzureOcrService ocrService = new AzureOcrService();
                 var ocrResult = await RunOcrAsync(filePath);
                 var response = await PostCorrectionAsync(ocrResult);
 
