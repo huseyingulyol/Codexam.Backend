@@ -49,26 +49,6 @@ Projenizin kök dizininde `appsettings.development.json` dosyasını bulundurmal
 }
 ```
 
-# CodExam Reader - Backend
-
-Bu proje, öğretmenlerin yaptığı kodlama sınavlarını dijital ortamda yönetmek, el yazısı ile çözülmüş kod sınav kağıtlarını tanımak ve öğrencilere otomatik puanlama yapmak için geliştirilmiş bir backend uygulamasıdır.
-
-## Teknolojiler
-
-
-## Proje Yapısı
-
-```
-CodExamReaderBackend/
-|-- Controllers/              # API endpoint'leri
-|-- Services/                 # İş mantığı (Business Logic)
-|-- Models/                   # Veritabanı modelleri
-|-- Data/                     # Veritabanı bağlantısı ve migrasyonlar
-|-- DTOs/                     # Veri transfer objeleri
-|-- Program.cs                # Uygulama başlangıç noktası
-|-- appsettings.json          # Konfigürasyon dosyası
-```
-
 ## Kurulum
 
 1. **Projeyi klonlayın:**
