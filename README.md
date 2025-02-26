@@ -1,4 +1,4 @@
-![veri_tabani_yapilandirmasi](https://github.com/user-attachments/assets/e9e74505-ffd0-4b0d-b25b-694e793bfab7)CodExam Reader - Backend
+# CodExam Reader - Backend
 
 Bu proje, öğretmenlerin yaptığı kodlama sınavlarını dijital ortamda yönetmek, el yazısı ile çözülmüş kod sınav kağıtlarını tanımak ve öğrencilere otomatik puanlama yapmak için geliştirilmiş bir backend uygulamasıdır.
 
@@ -27,7 +27,7 @@ Proje Yapısı
         ├── appsettings.json          # Konfigürasyon dosyası
 ```
 
-
+## Veri Tabanı Yapılandırması
 ![veri_tabani_yapilandirmasi](https://github.com/user-attachments/assets/65e53ba3-38c9-4363-ae29-4dbd6248e882)
 
 
