@@ -8,13 +8,14 @@ using System.IO;
 using System.Text.Json;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Codexam.WebAPI.Entities;
 
 namespace Codexam.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
 
-    public class PageController : ControllerBase
+    public class TeacherPageController : ControllerBase
     {
         private readonly HttpClient _httpClient;
         private readonly AppDbContext _context;
@@ -30,7 +31,7 @@ namespace Codexam.WebAPI.Controllers
             VisualFeatureTypes.Tags
         };
 
-        public PageController(IConfiguration configuration,HttpClient httpClient, AppDbContext context)
+        public TeacherPageController(IConfiguration configuration,HttpClient httpClient, AppDbContext context)
         {
             _configuration = configuration;
             _context = context;

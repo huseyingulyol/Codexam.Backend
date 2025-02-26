@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Codexam.WebAPI.Entities;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+});
+
+
+
+
 var app = builder.Build();
  
 // Configure the HTTP request pipeline.
@@ -31,6 +45,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseCors("AllowAll");
+
+
 app.Run();
 
 
@@ -40,6 +57,8 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<Exam> Exams { get; set; }
     public DbSet<TeacherPage> TeacherPages { get; set; }
 
 
@@ -74,25 +93,6 @@ public class AppDbContext : DbContext
 
 
 
-// Model
-public class BaseEntity
-{
-    public int Id { get; set; }
-    public DateTime CreatedAt { get; set; }
-}
+// 
 
 
-public class User : BaseEntity
-{
-    public string Email { get; set; }   
-    public string PasswordHash { get; set; }
-}
-
-public class TeacherPage : BaseEntity
-{
-    public int ExamId { get; set; }
-    public int Number { get; set; }
-    public string Url { get; set; }
-    public bool isSolved { get; set; }
-
-}
