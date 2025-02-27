@@ -15,7 +15,6 @@ Proje Yapısı
 ```
         ├── Controllers/              # API endpoint'leri
         ├── Entities/                 # Veritabanı modelleri/varlıkları
-        ├── DTos/                     # Backend frontend veri aktarırken varlığa kullanılan veri şeması
         ├── Migrations/      
         ├── Properties/    
         ├── Repositories/             # Varlıklara veritabanı düzeyinde işlem yaptığımız klasör
