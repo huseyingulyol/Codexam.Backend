@@ -37,6 +37,7 @@ namespace Codexam.WebAPI.Services
             byte[] passwordSalt, passwordHash;
 
             HashingHelper.CreatePasswordHash(registerRequest.Password, out passwordSalt, out passwordHash);
+            newUser.Email = registerRequest.Email;
             newUser.PasswordSalt = passwordSalt;
             newUser.PasswordHash = passwordHash;
             newUser.RoleId = 1;
