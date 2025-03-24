@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Codexam.WebAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250226082219_mig1122")]
-    partial class mig1122
+    [Migration("20250324202414_mig1123")]
+    partial class mig1123
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -69,9 +69,6 @@ namespace Codexam.WebAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ExamId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Number")
                         .HasColumnType("INTEGER");
 
@@ -83,8 +80,6 @@ namespace Codexam.WebAPI.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ExamId");
 
                     b.ToTable("TeacherPages");
                 });
@@ -102,9 +97,11 @@ namespace Codexam.WebAPI.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("BLOB");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("BLOB");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
@@ -125,17 +122,6 @@ namespace Codexam.WebAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Codexam.WebAPI.Entities.TeacherPage", b =>
-                {
-                    b.HasOne("Codexam.WebAPI.Entities.Exam", "Exam")
-                        .WithMany()
-                        .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Exam");
                 });
 
             modelBuilder.Entity("Codexam.WebAPI.Entities.User", b =>

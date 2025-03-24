@@ -55,7 +55,7 @@ namespace Codexam.WebAPI.Controllers
 
                 await CreatePage(new TeacherPage()
                 {
-                    ExamId = 1,
+                    //ExamId = 1,
                     Number = 1,
                     Url = filePath,
                     isSolved = false,
