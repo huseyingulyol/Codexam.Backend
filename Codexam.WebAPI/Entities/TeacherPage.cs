@@ -2,11 +2,13 @@
 {
     public class TeacherPage : BaseEntity
     {
-        //public int ExamId { get; set; }
+        public int ExamId { get; set; }
         public int Number { get; set; }
         public string Url { get; set; }
         public bool isSolved { get; set; }
-        //public virtual Exam Exam { get; set; }
+        public virtual Exam Exam { get; set; }
+
+        public virtual ICollection<Question> Questions { get; set; }
 
     }
 }

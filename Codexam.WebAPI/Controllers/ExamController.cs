@@ -45,11 +45,11 @@ namespace Codexam.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Exam>> CreateExam(Exam exam)
+        public async Task<ActionResult<Exam>> CreateExam(int userId, string name)
         {
-            _context.Exams.Add(exam);
+            _context.Exams.Add(new Exam() { Name = name, UserId = userId});
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetExam), new { id = exam.Id }, exam);
+            return Ok(new { message = "Sınav oluşturuldu.", userId });
         }
 
         [HttpPut("{id}")]
