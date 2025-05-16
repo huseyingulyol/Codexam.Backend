@@ -39,7 +39,7 @@ namespace Codexam.WebAPI.Controllers
         }
 
         [HttpPost("Upload")]
-        public async Task<IActionResult> Upload(IFormFile file)
+        public async Task<IActionResult> Upload(IFormFile file, [FromForm] int examId)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { error = "No file uploaded" });
@@ -53,10 +53,12 @@ namespace Codexam.WebAPI.Controllers
                     await file.CopyToAsync(stream);
                 }
 
+                var maxNumber = await _context.TeacherPages.MaxAsync(tp => (int?)tp.Number) ?? 0;
+
                 await CreatePage(new TeacherPage()
                 {
-                    //ExamId = 1,
-                    Number = 1,
+                    ExamId = examId,
+                    Number = maxNumber + 1,
                     Url = filePath,
                     isSolved = false,
                 });
@@ -70,6 +72,11 @@ namespace Codexam.WebAPI.Controllers
 
                 string extractedText = await ReadTextFromImage(computerVision, filePath);
                 string result = await PostCorrection(extractedText);
+
+                //string jsonHam = result.Replace("```json","").Replace("```","").Replace("\n","").Replace("\")
+
+
+
                 return Ok(new
                 {
                     message = "Successfully",

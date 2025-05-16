@@ -39,6 +39,44 @@ namespace Codexam.WebAPI.Migrations
                     b.ToTable("Exams");
                 });
 
+            modelBuilder.Entity("Codexam.WebAPI.Entities.Question", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte>("Number")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte>("Score")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TeacherPageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("TeacherPageId");
+
+                    b.ToTable("Questions");
+                });
+
             modelBuilder.Entity("Codexam.WebAPI.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -66,6 +104,9 @@ namespace Codexam.WebAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ExamId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Number")
                         .HasColumnType("INTEGER");
 
@@ -77,6 +118,8 @@ namespace Codexam.WebAPI.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExamId");
 
                     b.ToTable("TeacherPages");
                 });
@@ -113,12 +156,42 @@ namespace Codexam.WebAPI.Migrations
             modelBuilder.Entity("Codexam.WebAPI.Entities.Exam", b =>
                 {
                     b.HasOne("Codexam.WebAPI.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Exams")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Codexam.WebAPI.Entities.Question", b =>
+                {
+                    b.HasOne("Codexam.WebAPI.Entities.Question", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Codexam.WebAPI.Entities.TeacherPage", "TeacherPage")
+                        .WithMany("Questions")
+                        .HasForeignKey("TeacherPageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("TeacherPage");
+                });
+
+            modelBuilder.Entity("Codexam.WebAPI.Entities.TeacherPage", b =>
+                {
+                    b.HasOne("Codexam.WebAPI.Entities.Exam", "Exam")
+                        .WithMany("TeacherPages")
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exam");
                 });
 
             modelBuilder.Entity("Codexam.WebAPI.Entities.User", b =>
@@ -130,6 +203,21 @@ namespace Codexam.WebAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Codexam.WebAPI.Entities.Exam", b =>
+                {
+                    b.Navigation("TeacherPages");
+                });
+
+            modelBuilder.Entity("Codexam.WebAPI.Entities.TeacherPage", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("Codexam.WebAPI.Entities.User", b =>
+                {
+                    b.Navigation("Exams");
                 });
 #pragma warning restore 612, 618
         }

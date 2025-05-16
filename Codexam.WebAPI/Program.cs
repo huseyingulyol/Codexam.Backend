@@ -91,6 +91,8 @@ public class AppDbContext : DbContext
     public DbSet<Exam> Exams { get; set; }
     public DbSet<TeacherPage> TeacherPages { get; set; }
 
+    public DbSet<Question> Questions { get; set; }
+
 
     public override int SaveChanges()
     {

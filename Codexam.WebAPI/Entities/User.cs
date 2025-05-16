@@ -10,6 +10,7 @@ namespace Codexam.WebAPI.Entities
         public int RoleId { get; set; }
         [JsonIgnore]
         public virtual Role? Role { get; set; }
+        public virtual ICollection<Exam> Exams { get; set; }
     }
 
 }
