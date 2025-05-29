@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codexam.WebAPI", "Codexam.WebAPI\Codexam.WebAPI.csproj", "{EBA84C15-F7F0-461F-A753-2B8C4858B20B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codexam.WebAPI", "Codexam.WebAPI\Codexam.WebAPI.csproj", "{EBA84C15-F7F0-461F-A753-2B8C4858B20B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codexam.Domain", "Codexam.Domain\Codexam.Domain.csproj", "{3DC343DE-E88F-4903-82E2-DFD90D9CE880}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{EBA84C15-F7F0-461F-A753-2B8C4858B20B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBA84C15-F7F0-461F-A753-2B8C4858B20B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBA84C15-F7F0-461F-A753-2B8C4858B20B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DC343DE-E88F-4903-82E2-DFD90D9CE880}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DC343DE-E88F-4903-82E2-DFD90D9CE880}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DC343DE-E88F-4903-82E2-DFD90D9CE880}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DC343DE-E88F-4903-82E2-DFD90D9CE880}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

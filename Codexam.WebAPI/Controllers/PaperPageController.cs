@@ -8,17 +8,22 @@ using System.IO;
 using System.Text.Json;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Codexam.WebAPI.Entities;
+using Codexam.Domain.Entities;
+using Codexam.WebAPI.Constants;
+using Codexam.WebAPI.Persistence;
+using Codexam.WebAPI.DTOs;
+using Codexam.Domain.Models;
+using Codexam.Domain.Enums;
 
 namespace Codexam.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
 
-    public class TeacherPageController : ControllerBase
+    public class PaperPageController : ControllerBase
     {
         private readonly HttpClient _httpClient;
-        private readonly AppDbContext _context;
+        private readonly CodexamDbContext _context;
         private readonly IConfiguration _configuration;
 
         private const string UPLOAD_DIR = "uploads";
@@ -31,7 +36,7 @@ namespace Codexam.WebAPI.Controllers
             VisualFeatureTypes.Tags
         };
 
-        public TeacherPageController(IConfiguration configuration,HttpClient httpClient, AppDbContext context)
+        public PaperPageController(IConfiguration configuration,HttpClient httpClient, CodexamDbContext context)
         {
             _configuration = configuration;
             _context = context;
@@ -39,48 +44,71 @@ namespace Codexam.WebAPI.Controllers
         }
 
         [HttpPost("Upload")]
-        public async Task<IActionResult> Upload(IFormFile file, [FromForm] int examId)
+        public async Task<IActionResult> Upload([FromForm] PaperPageUploadDto dto)
         {
-            if (file == null || file.Length == 0)
+            if (dto.File == null || dto.File.Length == 0)
                 return BadRequest(new { error = "No file uploaded" });
 
             try
             {
                 Directory.CreateDirectory(UPLOAD_DIR);
-                var filePath = Path.Combine(UPLOAD_DIR, file.FileName);
+                var filePath = Path.Combine(UPLOAD_DIR, dto.File.FileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    await file.CopyToAsync(stream);
+                    await dto.File.CopyToAsync(stream);
                 }
 
-                var maxNumber = await _context.TeacherPages.MaxAsync(tp => (int?)tp.Number) ?? 0;
+                var maxNumber = await _context.PaperPages.MaxAsync(tp => (int?)tp.Number) ?? 0;
 
-                await CreatePage(new TeacherPage()
+                await CreatePage(new PaperPage()
                 {
-                    ExamId = examId,
+                    ExamId = dto.ExamId,
                     Number = maxNumber + 1,
-                    Url = filePath,
-                    isSolved = false,
+                    FilePath = filePath,
+                    Type = dto.PageType,
                 });
-
-
                 ComputerVisionClient computerVision = new ComputerVisionClient(
-             new ApiKeyServiceClientCredentials(_configuration["Azure:SubscriptionKey"]),
-             new System.Net.Http.DelegatingHandler[] { });
+                    new ApiKeyServiceClientCredentials(_configuration["Azure:SubscriptionKey"]));
 
                 computerVision.Endpoint = _configuration["Azure:Endpoint"];
 
                 string extractedText = await ReadTextFromImage(computerVision, filePath);
-                string result = await PostCorrection(extractedText);
 
-                //string jsonHam = result.Replace("```json","").Replace("```","").Replace("\n","").Replace("\")
+                string result = await PostCorrection(extractedText, dto.PageType);
 
+                if (result.StartsWith("```json"))
+                {
+                    result = result.Substring(7).TrimStart(); // 7 karakter: ```json
+                }
 
+                if (result.EndsWith("```"))
+                {
+                    result = result.Substring(0, result.Length - 3).TrimEnd(); // sondaki ```
+                }
+
+                if (dto.PageType == PageType.Answered)
+                {
+                    PaperPageJson? page = JsonSerializer.Deserialize<PaperPageJson>(result);
+                    if (page is not null)
+                    {
+                        foreach (var answer in page.answers)
+                        {
+                            var question = await _context.Questions.FirstOrDefaultAsync(q => q.Number == answer.no && q.ExamId == dto.ExamId);
+                            if (question != null)
+                            {
+                                question.Content = answer.content;
+                                _context.Questions.Update(question);
+                            }
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+
+                }
 
                 return Ok(new
                 {
                     message = "Successfully",
-                    filename = file.FileName,
+                    filename = dto.File.FileName,
                     response = result
                 });
             }
@@ -126,64 +154,15 @@ namespace Codexam.WebAPI.Controllers
 
             return extractedText.ToString();
         }
-        private async Task<string> PostCorrection(string ocrResult)
+        private async Task<string> PostCorrection(string ocrResult, PageType pageType)
         {
-            string _prompt =
-            """
-            Amaç: Kodlama sınavını çözen bir uygulama yaptık. Şuanda senden istediğimiz aşağıdaki verilen OCR çıktısını bir düzenlemen.
-
-
-            Kurallar:
-            Varolandan hariç hiç bir ekstra kelime ekleme veya silme yapma.
-            Algılayacağın soru tipleri bunlardır: "ACIK_UCLU", "KOD_YAZMA", "CIKTI_TAHMIN","BOSLUK_DOLDURMA", "DOGRU_YALNIS"
-                başka hiç bir tip dahil etme eğer burdakilerden farklı soru tipi varsa dahil etme!
-            Eğer sorunun yanında puan yazıyor ise "score" olarak ver. Eğer soruya ait bir puanlandırma yoksa "Belirsiz" diye belirt.
-            Eğer soru bir önceki başlığa aitse yani soru bir alt başlık sorusuysa bunu farkedip o sorunun içinde konumlandır.
-            Aşağıdaki bir örnek:
+            
+            IPrompt prompt = pageType switch
             {
-              .
-              .
-              question:[
-                .
-                .
-                questionNo:a
-                question:"soru"
-                .
-                .
-              ]
-              .
-              .
-            }
-
-            Önemli:
-            Varolan yazım hatalarını mantıksal ve sözdizimsel olarak analiz ederek düzenle.
-            JSON tipinde sana verilen formatla birebir şekilde bir çıktı ver.
-
-            Format:
-            questions:[
-              {
-                questionType:"CIKTI_TAHMIN",
-                questionNo:1,
-                question: [
-                  questionType:"",
-                  questionNo:1,
-                  question:
-                  questionScore:10,
-                ]
-                questionScore:10,
-
-              },
-              {
-                questionType:"",
-                questionNo:2,
-                question:"Aşağıdaki lisp prog.a... 1 cümleyle açıkla.\n(defun))"
-                questionScore:10,
-
-              },
-            ]
-
-            OCR Çıktısı:
-            """;
+                PageType.Unsolved => new UnsolvedPagePrompt(),
+                PageType.Answered => new AnsweredPagePrompt(),
+                _ => throw new ArgumentOutOfRangeException(nameof(pageType), pageType, null)
+            };
 
             if (string.IsNullOrWhiteSpace(ocrResult))
                 return ("OCR result cannot be empty");
@@ -199,7 +178,8 @@ namespace Codexam.WebAPI.Controllers
                         {
                             parts = new[]
                             {
-                                new { text = _prompt + ocrResult }
+
+                                new { text = prompt.GetPrompt() + ocrResult }
                             }
                         }
                     }
@@ -213,7 +193,6 @@ namespace Codexam.WebAPI.Controllers
 
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<JsonElement>(responseContent);
-                //var text = result.GetProperty("text").GetString();
                 var text = result.GetProperty("candidates")[0].GetProperty("content").GetProperty("parts")[0].GetProperty("text").GetString();
 
 
@@ -228,13 +207,13 @@ namespace Codexam.WebAPI.Controllers
             }
         }
 
-        private async Task<ActionResult<IEnumerable<TeacherPage>>> GetPages()
+        private async Task<ActionResult<IEnumerable<PaperPage>>> GetPages()
         {
-            return await _context.TeacherPages.ToListAsync();
+            return await _context.PaperPages.ToListAsync();
         }
-        private async Task<ActionResult<TeacherPage>> CreatePage(TeacherPage product)
+        private async Task<ActionResult<PaperPage>> CreatePage(PaperPage product)
         {
-            _context.TeacherPages.Add(product);
+            _context.PaperPages.Add(product);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetPages), new { id = product.Number }, product);
         }

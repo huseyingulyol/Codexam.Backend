@@ -1,4 +1,4 @@
-﻿using Codexam.WebAPI.Entities;
+﻿using Codexam.WebAPI.Persistence;
 using Codexam.WebAPI.Repositories;
 using Codexam.WebAPI.Services;
 using Codexam.WebAPI.Utilities.Encryption;
@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Add SQLite and EF Core
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<CodexamDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
@@ -59,7 +59,6 @@ builder.Services.AddCors(options =>
 
 
 
-
 var app = builder.Build();
  
 // Configure the HTTP request pipeline.
@@ -78,53 +77,9 @@ app.MapControllers();
 app.UseCors("AllowAll");
 
 
+
 app.Run();
 
 
-// DbContext
-public class AppDbContext : DbContext
-{
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-    public DbSet<User> Users { get; set; }
-    public DbSet<Role> Roles { get; set; }
-    public DbSet<Exam> Exams { get; set; }
-    public DbSet<TeacherPage> TeacherPages { get; set; }
-
-    public DbSet<Question> Questions { get; set; }
-
-
-    public override int SaveChanges()
-    {
-        AddTimestamps();
-        return base.SaveChanges();
-    }
-
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        AddTimestamps();
-        return await base.SaveChangesAsync(cancellationToken);
-    }
-
-    private void AddTimestamps()
-    {
-        var entries = ChangeTracker.Entries();
-
-        foreach (var entry in entries)
-        {
-            if (entry.Entity is BaseEntity entity)
-            {
-                if (entry.State == EntityState.Added)
-                {
-                    entity.CreatedAt = DateTime.Now;
-                }
-            }
-        }
-    }
-}
-
-
-
-// 
 
 

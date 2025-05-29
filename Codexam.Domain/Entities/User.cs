@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Codexam.WebAPI.Entities
+namespace Codexam.Domain.Entities
 {
     public class User : BaseEntity
     {

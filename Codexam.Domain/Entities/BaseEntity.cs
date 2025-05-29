@@ -1,4 +1,4 @@
-﻿namespace Codexam.WebAPI.Entities
+﻿namespace Codexam.Domain.Entities
 {
     public class BaseEntity
     {
